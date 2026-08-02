@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sudoku Nexus - Interactive Solver & Algorithm Visualizer</title>
+  <meta name="description" content="A modern, high-performance Sudoku Solver, visual backtracking algorithm simulator, smart hint engine, and puzzle generator with a sleek dark glassmorphism design.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- CSS Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app-background">
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+    <div class="bg-glow bg-glow-3"></div>
+  </div>
+
+  <div class="app-container">
+    <!-- Header Section -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3" y="3" width="18" height="18" rx="4" stroke="currentColor" stroke-width="2"/>
+            <path d="M9 3V21" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2 2"/>
+            <path d="M15 3V21" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2 2"/>
+            <path d="M3 9H21" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2 2"/>
+            <path d="M3 15H21" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2 2"/>
+            <circle cx="6" cy="6" r="1.5" fill="currentColor"/>
+            <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+            <circle cx="18" cy="18" r="1.5" fill="currentColor"/>
+          </svg>
+        </div>
+        <div>
+          <h1>Sudoku<span class="gradient-text">Nexus</span></h1>
+          <p class="subtitle">AI Solver & Visual Backtracking Engine</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <div class="timer-badge" id="timerBadge">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+          <span id="timerDisplay">00:00</span>
+        </div>
+
+        <button class="btn btn-secondary btn-icon-only" id="btnAudioToggle" title="Toggle Sound Effects">
+          <svg class="icon-sound-on" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+          </svg>
+          <svg class="icon-sound-off hidden" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="1" y1="1" x2="23" y2="23"/>
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+          </svg>
+        </button>
+
+        <button class="btn btn-secondary" id="btnHowItWorks">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          Algorithm Info
+        </button>
+      </div>
+    </header>
+
+    <!-- Difficulty & Preset Selector Bar -->
+    <div class="control-card difficulty-bar">
+      <div class="difficulty-selector">
+        <span class="label">Difficulty:</span>
+        <div class="segmented-control" id="difficultySelector">
+          <button class="segment-btn active" data-difficulty="easy">Easy</button>
+          <button class="segment-btn" data-difficulty="medium">Medium</button>
+          <button class="segment-btn" data-difficulty="hard">Hard</button>
+          <button class="segment-btn" data-difficulty="expert">Expert</button>
+          <button class="segment-btn" data-difficulty="custom">Custom / Blank</button>
+        </div>
+      </div>
+
+      <div class="action-group">
+        <button class="btn btn-primary" id="btnNewGame">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+          </svg>
+          New Game
+        </button>
+        <button class="btn btn-secondary" id="btnImportExport">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Import / Export
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Workspace -->
+    <main class="main-layout">
+      <!-- Sudoku Board & Status Column -->
+      <section class="board-column">
+        <!-- Status & Banner Notification -->
+        <div class="status-banner" id="statusBanner">
+          <span class="status-dot"></span>
+          <span class="status-text" id="statusText">Ready — Select a cell or start solving</span>
+        </div>
+
+        <!-- 9x9 Sudoku Canvas Grid -->
+        <div class="sudoku-grid-wrapper">
+          <div class="sudoku-grid" id="sudokuGrid">
+            <!-- 81 cells will be rendered dynamically by JS -->
+          </div>
+        </div>
+
+        <!-- Gameplay Toolbar Below Grid -->
+        <div class="game-toolbar">
+          <button class="tool-btn" id="btnUndo" title="Undo (Ctrl+Z)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 7v6h6"/>
+              <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/>
+            </svg>
+            <span>Undo</span>
+          </button>
+
+          <button class="tool-btn" id="btnRedo" title="Redo (Ctrl+Y)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 7v6h-6"/>
+              <path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"/>
+            </svg>
+            <span>Redo</span>
+          </button>
+
+          <button class="tool-btn" id="btnErase" title="Erase Cell (Backspace/Delete)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 5H9l-7 7 7 7h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2z"/>
+              <line x1="18" y1="9" x2="12" y2="15"/>
+              <line x1="12" y1="9" x2="18" y2="15"/>
+            </svg>
+            <span>Erase</span>
+          </button>
+
+          <button class="tool-btn" id="btnNotesToggle" title="Toggle Pencil Notes (N)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 20h9"/>
+              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+            </svg>
+            <span>Pencil</span>
+            <span class="badge" id="notesBadge">OFF</span>
+          </button>
+
+          <button class="tool-btn" id="btnAutoCandidates" title="Auto-fill candidate pencil marks">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"/>
+              <rect x="14" y="3" width="7" height="7"/>
+              <rect x="14" y="14" width="7" height="7"/>
+              <rect x="3" y="14" width="7" height="7"/>
+            </svg>
+            <span>Auto Notes</span>
+          </button>
+
+          <button class="tool-btn accent-tool" id="btnHint" title="Get a Smart Hint (H)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
+            </svg>
+            <span>Smart Hint</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Sidebar Panel: Solver Controls, Numpad, Explanations -->
+      <aside class="sidebar-column">
+        <!-- Visual Solver Control Card -->
+        <div class="glass-card solver-control-card">
+          <div class="card-header">
+            <h3>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+              </svg>
+              Algorithm Solver
+            </h3>
+            <span class="status-pill idle" id="solverStatePill">Idle</span>
+          </div>
+
+          <div class="solver-actions-row">
+            <button class="btn btn-visual-solve" id="btnVisualSolve">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" fill="currentColor">
+                <polygon points="5 3 19 12 5 21 5 3"/>
+              </svg>
+              Watch Visual Solve
+            </button>
+            <button class="btn btn-instant-solve" id="btnInstantSolve">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+              </svg>
+              Instant Solve
+            </button>
+          </div>
+
+          <div class="solver-control-group hidden" id="solvingActiveControls">
+            <button class="btn btn-secondary btn-full" id="btnPauseResumeSolve">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="6" y="4" width="4" height="16"/>
+                <rect x="14" y="4" width="4" height="16"/>
+              </svg>
+              Pause Solver
+            </button>
+            <button class="btn btn-danger btn-full" id="btnStopSolve">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="4" y="4" width="16" height="16"/>
+              </svg>
+              Stop Solver
+            </button>
+          </div>
+
+          <!-- Speed Slider -->
+          <div class="speed-slider-container">
+            <div class="speed-label-row">
+              <span>Visual Speed:</span>
+              <span id="speedValueText" class="mono-highlight">Fast (15 ms)</span>
+            </div>
+            <input type="range" id="solverSpeedSlider" min="1" max="300" value="15" step="1" class="custom-range">
+            <div class="speed-ticks">
+              <span>Ultra</span>
+              <span>Fast</span>
+              <span>Step</span>
+            </div>
+          </div>
+
+          <!-- Real-time Metrics -->
+          <div class="metrics-grid">
+            <div class="metric-box">
+              <span class="metric-value mono-highlight" id="metricSteps">0</span>
+              <span class="metric-label">Evaluations</span>
+            </div>
+            <div class="metric-box">
+              <span class="metric-value mono-highlight" id="metricBacktracks">0</span>
+              <span class="metric-label">Backtracks</span>
+            </div>
+            <div class="metric-box">
+              <span class="metric-value mono-highlight" id="metricTime">0 ms</span>
+              <span class="metric-label">Compute Time</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Virtual Numpad & Input -->
+        <div class="glass-card numpad-card">
+          <div class="numpad-grid">
+            <button class="numpad-btn" data-value="1">1</button>
+            <button class="numpad-btn" data-value="2">2</button>
+            <button class="numpad-btn" data-value="3">3</button>
+            <button class="numpad-btn" data-value="4">4</button>
+            <button class="numpad-btn" data-value="5">5</button>
+            <button class="numpad-btn" data-value="6">6</button>
+            <button class="numpad-btn" data-value="7">7</button>
+            <button class="numpad-btn" data-value="8">8</button>
+            <button class="numpad-btn" data-value="9">9</button>
+          </div>
+          <div class="numpad-bottom-row">
+            <button class="btn btn-secondary btn-full" id="btnValidateBoard">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Check Board
+            </button>
+            <button class="btn btn-secondary btn-full" id="btnResetBoard">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                <path d="M3 3v5h5"/>
+              </svg>
+              Reset
+            </button>
+          </div>
+        </div>
+
+        <!-- Explanation & Hint Details Card -->
+        <div class="glass-card hint-card hidden" id="hintExplanationCard">
+          <div class="card-header">
+            <h4>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="16" x2="12" y2="12"/>
+                <line x1="12" y1="8" x2="12.01" y2="8"/>
+              </svg>
+              Step Explanation
+            </h4>
+            <button class="btn-close-sm" id="btnCloseHintCard">&times;</button>
+          </div>
+          <div class="hint-content" id="hintExplanationText">
+            <!-- Dynamic hint explanation inserted here -->
+          </div>
+          <button class="btn btn-primary btn-full mt-2" id="btnApplyHint">Apply Suggested Move</button>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <!-- Modals -->
+
+  <!-- Modal 1: Custom Import / Export -->
+  <div class="modal-overlay hidden" id="modalImportExport">
+    <div class="modal-box glass-card">
+      <div class="modal-header">
+        <h3>Import / Export Sudoku Board</h3>
+        <button class="modal-close" id="btnCloseImportModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">
+          Paste an 81-character puzzle string (use <code>0</code> or <code>.</code> for empty cells) or copy your current puzzle.
+        </p>
+        <div class="input-group">
+          <label for="importBoardString">Board String (81 chars):</label>
+          <textarea id="importBoardString" rows="3" placeholder="530070000600195000098000060800060003400803001700020006060000280000419005000080079"></textarea>
+        </div>
+
+        <div class="preset-samples">
+          <span class="label">Load Sample Puzzle:</span>
+          <div class="sample-buttons">
+            <button class="btn btn-sm btn-secondary sample-btn" data-sample="worldHardest">World's Hardest (Arto Inkala)</button>
+            <button class="btn btn-sm btn-secondary sample-btn" data-sample="classicEasy">Classic Easy</button>
+            <button class="btn btn-sm btn-secondary sample-btn" data-sample="expertDiabolical">Diabolical</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btnCopyBoardString">Copy String</button>
+        <button class="btn btn-primary" id="btnApplyImportString">Load Puzzle</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: How Algorithm Works -->
+  <div class="modal-overlay hidden" id="modalHowItWorks">
+    <div class="modal-box glass-card modal-lg">
+      <div class="modal-header">
+        <h3>How the AI Solver Works</h3>
+        <button class="modal-close" id="btnCloseHowModal">&times;</button>
+      </div>
+      <div class="modal-body algorithm-guide">
+        <div class="guide-section">
+          <h4>1. Backtracking Algorithm (Depth-First Search)</h4>
+          <p>
+            Backtracking is a systematic recursive algorithm for finding solutions to constraint satisfaction problems. It attempts to build a solution incrementally, digit by digit. As soon as it determines a path cannot possibly yield a valid solution, it <strong>backtracks</strong> to the previous state and tries the next number.
+          </p>
+        </div>
+        <div class="guide-section">
+          <h4>2. Minimum Remaining Values (MRV) Heuristic</h4>
+          <p>
+            Instead of picking empty cells sequentially, our optimized engine selects empty cells with the <strong>fewest valid candidates</strong> first. This dramatically reduces the search tree depth, speeding up solve times by up to 100x.
+          </p>
+        </div>
+        <div class="guide-section">
+          <h4>3. Visual Legend</h4>
+          <div class="legend-items">
+            <div class="legend-item"><span class="legend-box state-trying"></span> Trying Candidate</div>
+            <div class="legend-item"><span class="legend-box state-valid"></span> Valid Candidate</div>
+            <div class="legend-item"><span class="legend-box state-backtrack"></span> Backtracking / Dead End</div>
+            <div class="legend-item"><span class="legend-box state-conflict"></span> Conflict Duplicate</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" id="btnCloseHowModal2">Got it!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript Modules -->
+  <script src="js/audio.js"></script>
+  <script src="js/solver.js"></script>
+  <script src="js/hints.js"></script>
+  <script src="js/generator.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
