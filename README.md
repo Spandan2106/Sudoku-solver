@@ -1,3 +1,5 @@
+[![Architecture diagram](https://gitdiagram.com/diagram-badge.svg)](https://gitdiagram.com/spandan2106/sudoku-solver?utm_source=readme&utm_medium=badge)
+[![Architecture diagram of spandan2106/sudoku-solver](https://gitdiagram.com/spandan2106/sudoku-solver/diagram.png)](https://gitdiagram.com/spandan2106/sudoku-solver?utm_source=readme&utm_medium=picture)
 # 🧩 Sudoku Solver
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
